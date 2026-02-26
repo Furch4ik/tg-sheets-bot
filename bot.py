@@ -10,7 +10,7 @@ client = gspread.authorize(creds)
 sheet = client.open('Таблиця клієнтів').sheet1
 
 # --- Налаштування Telegram бота ---
-BOT_TOKEN = '8645465791:AAEEWdiTcrlavoxQ01Z3p2YJuBfh_S364ZI'
+BOT_TOKEN = BOT_TOKEN = '8645465791:AAEEWdiTcrlavoxQ01Z3p2YJuBfh_S364ZI'
 bot = telebot.TeleBot(BOT_TOKEN)
 
 user_data = {}
@@ -44,17 +44,12 @@ def send_help(message):
     )
     bot.send_message(message.chat.id, help_text, parse_mode='Markdown')
 
-
 # Команда /table
 @bot.message_handler(commands=['table'])
 def send_table_link(message):
     try:
-        
         table_url = f"https://docs.google.com/spreadsheets/d/{sheet.spreadsheet.id}"
-        
-        
         text = f"🔗 <b>Ваша база клієнтів:</b>\n{table_url}"
-        
         
         markup = types.InlineKeyboardMarkup()
         btn = types.InlineKeyboardButton("Відкрити таблицю 📊", url=table_url)
@@ -70,7 +65,7 @@ def send_table_link(message):
         bot.send_message(message.chat.id, "⚠️ Не вдалося отримати посилання.")
         print(f"Помилка: {e}")
 
-
+# Команда /cancel
 @bot.message_handler(commands=['cancel'])
 def cancel(message):
     user_data.pop(message.chat.id, None)
@@ -78,7 +73,16 @@ def cancel(message):
     bot.send_message(message.chat.id, "❌ Введення скасовано.")
 
 def process_name_step(message):
-    if message.text.startswith('/'): return 
+    # ПРАВИЛЬНА ОБРОБКА СКАСУВАННЯ
+    if message.text == '/cancel':
+        cancel(message)
+        return
+    # Якщо ввели іншу команду випадково
+    elif message.text.startswith('/'):
+        bot.send_message(message.chat.id, "⚠️ Очікується ім'я. Для скасування натисніть /cancel.")
+        bot.register_next_step_handler(message, process_name_step)
+        return
+
     try:
         chat_id = message.chat.id
         user_data[chat_id] = {'name': message.text}
@@ -88,7 +92,16 @@ def process_name_step(message):
         bot.reply_to(message, "Помилка. Спробуйте /start ще раз.")
 
 def process_phone_step(message):
-    if message.text.startswith('/'): return
+    # ПРАВИЛЬНА ОБРОБКА СКАСУВАННЯ
+    if message.text == '/cancel':
+        cancel(message)
+        return
+    # Якщо ввели іншу команду випадково
+    elif message.text.startswith('/'):
+        bot.send_message(message.chat.id, "⚠️ Очікується номер телефону. Для скасування натисніть /cancel.")
+        bot.register_next_step_handler(message, process_phone_step)
+        return
+
     try:
         chat_id = message.chat.id
         phone = message.text
@@ -98,7 +111,7 @@ def process_phone_step(message):
         bot.send_message(chat_id, "✅ Дані успішно додано!")
         del user_data[chat_id]
     except Exception as e:
-        bot.reply_to(message, "⚠️ Помилка збереження.")
+        bot.reply_to(message, "⚠️ Помилка збереження. Можливо, проблема з доступом до таблиці.")
         print(f"Error: {e}")
 
 if __name__ == '__main__':
