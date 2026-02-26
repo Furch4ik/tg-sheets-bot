@@ -7,10 +7,10 @@ from telebot import types
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
 client = gspread.authorize(creds)
-sheet = client.open('Таблиця клієнтів').sheet1
+sheet = client.open('База клієнтів 1708').sheet1
 
 # --- Налаштування Telegram бота ---
-BOT_TOKEN = BOT_TOKEN = '8645465791:AAEEWdiTcrlavoxQ01Z3p2YJuBfh_S364ZI'
+BOT_TOKEN = '8645465791:AAEEWdiTcrlavoxQ01Z3p2YJuBfh_S364ZI'
 bot = telebot.TeleBot(BOT_TOKEN)
 
 user_data = {}
