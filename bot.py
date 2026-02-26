@@ -104,4 +104,4 @@ def process_phone_step(message):
 if __name__ == '__main__':
     print("Бот запущений (Furchik edition)...")
     set_main_menu()
-    bot.polling(none_stop=True)
+    bot.infinity_polling(timeout=10, long_polling_timeout=5)
