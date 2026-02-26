@@ -1,0 +1,7 @@
+cat <<EOF > .gitignore
+credentials.json
+venv/
+__pycache__/
+*.pyc
+.env
+EOF
